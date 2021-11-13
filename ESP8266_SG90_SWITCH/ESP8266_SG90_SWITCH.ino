@@ -38,7 +38,6 @@ int pos = 0;    // 角度存储变量
 
 void setup() {
   Serial.begin(115200);
-  //  wifi_connect(); // in wifi_info.h
   EEPROM.begin(350);
   wifi_load();
   pinMode(PIN_Servo, OUTPUT); //设置舵机输出
@@ -50,11 +49,9 @@ void setup() {
 }
 
 void loop() {
-  wifi_pant();//查看wifi情况
-  if (WiFi.status() == WL_CONNECTED) {
+    wifi_pant();//查看wifi情况
     my_homekit_loop();
-    delay(10);
-  }
+
   //  Serial.print((int)temperature); Serial.print(" *C, ");
   //  Serial.print((int)humidity); Serial.println(" H");
   //  delay(1500);

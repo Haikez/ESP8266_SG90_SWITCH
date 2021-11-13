@@ -16,30 +16,7 @@ int size_data = 0; //WIFI数据长度
 String wifiname="";
 String wifipsw="";
 int wifiname_len; // wifi名的长度
-// String WIFI_SSID;
-// String WIFI_PWD;
 
-// struct wifi_config_type
-// {
-// 	char sta_SSID[32]; //定义得到的SSID(最大32字节)
-// 	char sta_PWD[32];  //定义配网得到的密码(最大32字节)
-// };
-
-// wifi_config_type wifi_config; //声明定义内容
-
-// void saveConfig() //保存函数
-// {
-// 	EEPROM.begin(300); //向系统申请1024kb ROM
-// 	//开始写入
-// 	uint8_t *p = (uint8_t *)(&wifi_config);
-// 	for (int i = 0; i < sizeof(wifi_config); i++)
-// 	{
-// 		EEPROM.write(i, *(p + i)); //在闪存内模拟写入
-// 		delay(10);
-
-// 	}
-// 	EEPROM.commit(); //执行写入ROM
-// }
 void write_eeprom() //写入函数
 {
   while (1)
@@ -99,21 +76,6 @@ void read_eeprom() //读取函数
   Serial.print("PASSWORD:");
   Serial.println(wifipsw);
 }
-// void loadConfig() //读取函数
-// {
-// 	EEPROM.begin(300);
-// 	uint8_t *p = (uint8_t *)(&wifi_config);
-// 	for (int i = 0; i < sizeof(wifi_config); i++)
-// 	{
-// 		*(p + i) = EEPROM.read(i);
-// 				delay(10);
-
-// 	}
-// 	EEPROM.commit();
-// 	delay(100);
-// 	WIFI_SSID = wifi_config.sta_SSID;
-// 	WIFI_PWD = wifi_config.sta_PWD;
-// }
 
 String wifi_flag = "0";				  //配网标志
 const char *AP_NAME = "智能灯控配网"; //wifi名字
@@ -155,7 +117,7 @@ String wifi_type(int typecode)
 		return "WPA*";
 }
 
-void wifiScan()
+void wifiScan() //扫描周围的wifi信息
 {
 	String req_json = "";
 	Serial.println("Scan WiFi");
@@ -167,7 +129,6 @@ void wifiScan()
 		for (int i = 0; i < n; i++)
 		{
 			if ((int)WiFi.RSSI(i) >= Signal_filtering)
-			//  if (1)
 			{
 				m++;
 				String a = "{\"ssid\":\"" + (String)WiFi.SSID(i) + "\"," + "\"encryptionType\":\"" + wifi_type(WiFi.encryptionType(i)) + "\"," + "\"rssi\":" + (int)WiFi.RSSI(i) + "},";
@@ -184,15 +145,6 @@ void wifiScan()
 		Serial.print(" WiFi!  >");
 		Serial.print(Signal_filtering);
 		Serial.println("dB");
-	}
-}
-
-void opera()
-{
-	if (webServer.arg("opera") == "sb")
-	{
-
-		webServer.send(200, "text/plain", Hostname);
 	}
 }
 
@@ -218,7 +170,6 @@ void wifiConfig()
 
 			Serial.print("Connenting");
 
-			//      WiFi.mode(WIFI_STA);
 			WiFi.begin(ssid, password);
 			delay(5000);
 			//连接wifi
@@ -244,8 +195,6 @@ void wifiConfig()
 				wifi_flag = "1";
 				wifiname=ssid;
 				wifipsw=password;
-				// strcpy(wifiname, ssid_str);	  //复制ssid
-				// strcpy(wifipsw, password_str); //复制pwd
 				Serial.println(wifiname);
 				Serial.println(wifipsw);
 				write_eeprom(); //调用保存函数
@@ -293,7 +242,6 @@ void initWebServer(void)
 	}
 	webServer.on("/wificonfig", wifiConfig);
 	webServer.on("/wifiscan", wifiScan);
-	webServer.on("/opera", opera);
 	if (wifi_flag == "0")
 		webServer.onNotFound([]()
 							{ webServer.send(200, "text/html", responseHTML); });
@@ -315,11 +263,10 @@ void connectNewWifi(void)
 	WiFi.hostname(Hostname);   //设置ESP8266设备名
 	WiFi.mode(WIFI_STA);	   //切换为STA模式
 	WiFi.setAutoConnect(true); //设置自动连接
-	read_eeprom();			   //读取信息
+	read_eeprom();			   //读取wifi信息
 	delay(100);
 	Serial.print(wifiname);
 	Serial.print(wifipsw);
-	// WiFi.begin();
 	WiFi.begin(wifiname, wifipsw); //连接上一次连接成功的wifi
 	Serial.println("");
 	Serial.print("start Connect to wifi");
@@ -381,11 +328,6 @@ void wifi_pant()
 		digitalWrite(LED, LOW);
 		webServer.handleClient();
 		dnsServer.processNextRequest();
-	}
-	else if (wifi_flag == "1")
-	{
-		Serial.println("Wifi 已连接");
-		delay(3000);
 	}
 }
 
