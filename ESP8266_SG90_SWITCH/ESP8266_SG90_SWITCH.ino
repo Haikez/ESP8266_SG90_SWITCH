@@ -25,7 +25,7 @@
 #include <arduino_homekit_server.h>
 #include <Servo.h>
 #include <SimpleDHT.h>
-#define LOG_D(fmt, ...)   printf_P(PSTR(fmt "\n") , ##__VA_ARGS__);
+//#define LOG_D(fmt, ...)   printf_P(PSTR(fmt "\n") , ##__VA_ARGS__);
 #define PIN_DHT11 0
 #define PIN_Servo 3
 #define PIN_LED 2
@@ -44,7 +44,7 @@ void setup() {
   pinMode(PIN_LED, OUTPUT); //设置板载LED灯
   myServo.attach(PIN_Servo);
 
-  //homekit_storage_reset(); // to remove the previous HomeKit pairing storage when you first run this new HomeKit example
+//  homekit_storage_reset(); // to remove the previous HomeKit pairing storage when you first run this new HomeKit example
   my_homekit_setup();
 }
 
@@ -75,7 +75,7 @@ static uint32_t next_report_millis = 0;
 void cha_switch_on_setter(const homekit_value_t value) {
   bool on = value.bool_value;
   cha_switch_on.value.bool_value = on;  //sync the value
-  LOG_D("Switch: %s", on ? "ON" : "OFF");
+//  LOG_D("Switch: %s", on ? "ON" : "OFF");
   if (on) {
     for (pos = 90; pos < 180; pos += 5) { // 90°到180°
       // in steps of 1 degree
@@ -124,15 +124,15 @@ void my_homekit_loop() {
   const uint32_t t = millis();
   if (t > next_report_millis) {
     // report sensor values every 10 seconds
-    next_report_millis = t + 10 * 1000;
+    next_report_millis = t + 600 * 1000;
     my_homekit_report();
   }
-  if (t > next_heap_millis) {
-    // show heap info every 5 seconds
-    next_heap_millis = t + 5 * 1000;
-    LOG_D("Free heap: %d, HomeKit clients: %d",
-          ESP.getFreeHeap(), arduino_homekit_connected_clients_count());
-  }
+//  if (t > next_heap_millis) {
+//    // show heap info every 5 seconds
+//    next_heap_millis = t + 5 * 1000;
+//    LOG_D("Free heap: %d, HomeKit clients: %d",
+//          ESP.getFreeHeap(), arduino_homekit_connected_clients_count());
+//  }
 
 }
 
